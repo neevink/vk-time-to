@@ -5,43 +5,44 @@ import PanelHeader from '@vkontakte/vkui/dist/components/PanelHeader/PanelHeader
 import Button from '@vkontakte/vkui/dist/components/Button/Button';
 import Group from '@vkontakte/vkui/dist/components/Group/Group';
 import Cell from '@vkontakte/vkui/dist/components/Cell/Cell';
+import List from '@vkontakte/vkui/dist/components/List/List'
 import Div from '@vkontakte/vkui/dist/components/Div/Div';
 import Avatar from '@vkontakte/vkui/dist/components/Avatar/Avatar';
 
-const Home = ({ id, go, fetchedUser }) => (
-	<Panel id={id}>
-		<PanelHeader>Example</PanelHeader>
-		{fetchedUser &&
-		<Group title="User Data Fetched with VK Bridge">
-			<Cell
-				before={fetchedUser.photo_200 ? <Avatar src={fetchedUser.photo_200}/> : null}
-				description={fetchedUser.city && fetchedUser.city.title ? fetchedUser.city.title : ''}
-			>
-				{`${fetchedUser.first_name} ${fetchedUser.last_name}`}
-			</Cell>
-		</Group>}
+import { SimpleCell, CellButton } from '@vkontakte/vkui';
 
-		<Group title="Navigation Example">
-			<Div>
-				<Button size="xl" level="2" onClick={go} data-to="persik">
-					Show me the Persik, please
-				</Button>
-			</Div>
-		</Group>
-	</Panel>
-);
+import {Icon28AddOutline} from '@vkontakte/icons/dist/28/add_outline'
 
-Home.propTypes = {
-	id: PropTypes.string.isRequired,
-	go: PropTypes.func.isRequired,
-	fetchedUser: PropTypes.shape({
-		photo_200: PropTypes.string,
-		first_name: PropTypes.string,
-		last_name: PropTypes.string,
-		city: PropTypes.shape({
-			title: PropTypes.string,
-		}),
-	}),
-};
+import Header from '@vkontakte/vkui/dist/components/Header/Header'
+import ListOfDeadlines from './ListOfDeadlines'
+
+import App from '../App'
+
+
+const listOfDeadlines = [
+	{
+		name:"Новый год",
+		occur:new Date('2021-01-01T00:00:00')
+	},
+	{
+		name:"Экзамен по физике",
+		occur:new Date('2021-02-02T12:01:07')
+	},
+]
+
+class Home extends React.Component{
+	constructor(props){
+		super(props)
+	}
+
+	render(){
+		return (
+			<Panel id={this.props.id}>
+				<PanelHeader>Дедлайны:</PanelHeader>
+				<Button onClick={ () => App.changePanel('persik') }>Клик!</Button>
+			</Panel>
+		);
+	}
+}
 
 export default Home;
