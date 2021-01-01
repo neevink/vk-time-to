@@ -11,7 +11,9 @@ import DeadlineDetail from './panels/DeadlineDetail'
 import Panel from '@vkontakte/vkui/dist/components/Panel/Panel'
 
 import Button from '@vkontakte/vkui/dist/components/Button/Button'
-import { PanelHeader, Group, Cell, CellButton } from '@vkontakte/vkui';
+import { PanelHeader, Group, Cell, CellButton, FormLayout, Select } from '@vkontakte/vkui';
+import FormField from '@vkontakte/vkui/dist/components/FormField/FormField'
+import Input from '@vkontakte/vkui/dist/components/Input/Input'
 
 
 import PropTypes from 'prop-types';
@@ -27,25 +29,9 @@ import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
 import Icon28ListPlayOutline from '@vkontakte/icons/dist/28/list_play_outline';
 import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline'
 
-const osName = platform();
+import SelectMimicry from '@vkontakte/vkui/dist/components/SelectMimicry/SelectMimicry'
 
-const listOfDeadlines = [
-	{
-		id:0,
-		name:"Новый год",
-		occur:new Date('2021-01-01T00:00:00')
-	},
-	{
-		id:1,
-		name:"Экзамен по физике",
-		occur:new Date('2021-02-02T12:01:00')
-	},
-	{
-		id:2,
-		name:"Деделать программку",
-		occur:new Date('2021-01-01T18:02:00')
-	}
-]
+const osName = platform();
 
 class App extends React.Component{
 	constructor(props) {
@@ -53,11 +39,28 @@ class App extends React.Component{
 
     	this.state = {
 			activePanel: 'home',
-			selectedDeadline:-1,
-			time: Date.now()
+			selectedDeadline:null,
+			time: Date.now(),
+			listOfDeadlines: [{
+				key:0,
+				name:"Новый год",
+				occur:new Date('2021-01-01T00:00:00')
+			},
+			{
+				key:1,
+				name:"Экзамен по физике",
+				occur:new Date('2021-02-02T12:01:00')
+			},
+			{
+				key:2,
+				name:"Деделать программку",
+				occur:new Date('2021-01-01T18:02:00')
+			}]
 		}
 
 		this.openDialog = this.openDialog.bind(this);
+		this.createNew = this.createNew.bind(this);
+		this.delete = this.delete.bind(this);
 	}
 
 	componentDidMount() {
@@ -91,38 +94,58 @@ class App extends React.Component{
 		let hours = dif % 24;
 		dif = Math.floor(dif / 24); // Теперь количество дней
 
-
 		return dif + 'д. ' + hours + 'ч. ' + min + 'м. ' + sec + 'с.';
+	}
+
+	delete(){
+		let arr = this.state.listOfDeadlines.slice()
+		let index = arr.indexOf(this.state.selectedDeadline);
+
+		arr.splice(index, 1)
+		this.setState({ listOfDeadlines: arr })
+	}
+
+	createNew(e){
+		let newDeadline = {
+			key:19,
+			name:"Новый дедлайн",
+			occur:new Date('2021-01-01T23:57:00')
+		};
+		
+		//this.setState({ activePanel: 'persik' })
+
+		this.setState({ listOfDeadlines: this.state.listOfDeadlines.concat(newDeadline), activePanel: 'home' })
 	}
 
 	openDialog () {
 		this.setState({ popout:
-		  <ActionSheet 
-			onClose={ () => this.setState({ popout: null }) }
-			iosCloseItem={<ActionSheetItem autoclose mode="cancel">Отменить</ActionSheetItem>}
-		  >
-			<ActionSheetItem autoclose before={<Icon28EditOutline/>}>
-			  Редактировать
-			</ActionSheetItem>
-			<ActionSheetItem autoclose before={<Icon28ShareOutline/>}>
-			  Поделиться
-			</ActionSheetItem>
-			<ActionSheetItem
-			  autoclose
-			  before={platform === IOS ? <Icon28DeleteOutline/> : <Icon28DeleteOutlineAndroid />}
-			  mode="destructive"
+			<ActionSheet 
+				onClose={ () => this.setState({ popout: null }) }
+				iosCloseItem={<ActionSheetItem autoclose mode="cancel">Отменить</ActionSheetItem>}
 			>
-			  Удалить дедлайн
-			</ActionSheetItem>
+				<ActionSheetItem autoclose before={<Icon28EditOutline/>} onClick={ () => this.setState({ popout: null, activePanel: 'deadlineDetail'})}>
+					Редактировать
+				</ActionSheetItem>
+				<ActionSheetItem autoclose before={<Icon28ShareOutline/>}>
+				  	Поделиться
+				</ActionSheetItem>
+				<ActionSheetItem
+				  	autoclose
+				  	before={platform === IOS ? <Icon28DeleteOutline/> : <Icon28DeleteOutlineAndroid />}
+					  mode="danger"
+					  onClick={this.delete}
+				>
+				  	Удалить дедлайн
+				</ActionSheetItem>
 		  </ActionSheet>
 		});
-	  }
+	}
 
 	render(){
 
-        const listOfItems = listOfDeadlines.map(e => 
-			<Cell onClick={ () => {this.setState({selectedDeadline:e.id}); this.openDialog()} }
-				indicator={this.getLovelyDate(e.occur)}>
+        let listOfItems = this.state.listOfDeadlines.map(e => 
+			<Cell onClick={ () => {this.setState({selectedDeadline:e}); this.openDialog()} }
+				key={this.state.listOfDeadlines.indexOf(e)} indicator={this.getLovelyDate(e.occur)}>
 				{e.name}
 			</Cell>
         );
@@ -132,13 +155,12 @@ class App extends React.Component{
 				<Panel id='home'>
 					<PanelHeader>Дедлайны</PanelHeader>
 
-					<CellButton before={<Icon28AddOutline/>} onClick={this.openDialog}>Создать новый</CellButton>
+					<CellButton before={<Icon28AddOutline/>} onClick={ () => this.setState({activePanel:'newDeadline'})}>Создать</CellButton>
 
 					<Group>{listOfItems}</Group>
 
 					<Button onClick={ () => this.setState({activePanel: 'persik'}) }>Клик!</Button>
 
-					<CellButton  onClick={this.openDialog}>Список с иконками</CellButton>
 				</Panel>
 
 				<Persik id='persik'/>
@@ -149,15 +171,41 @@ class App extends React.Component{
 							{osName === IOS ? <Icon28ChevronBack/> : <Icon24Back/>}
 						</PanelHeaderButton>}
 					>
-						{this.state.selectedDeadline}
+						{this.state.selectedDeadline == null ? '' : this.state.selectedDeadline.name}
 					</PanelHeader>
+				</Panel>
+
+				<Panel id='newDeadline'>
+					<PanelHeader
+						left={<PanelHeaderButton onClick={ () => this.setState({activePanel: 'home'})}>
+							{osName === IOS ? <Icon28ChevronBack/> : <Icon24Back/>}
+						</PanelHeaderButton>}
+					>
+						Новый дедлайн
+					</PanelHeader>
+
+					<Group>
+						<FormLayout >
+							<FormField top="Название">            
+                				<Input placeholder="Название"/>
+              				</FormField>
+
+							<FormField top="День">            
+                				<Input type='date' placeholder="День"/>
+              				</FormField>
+
+							<FormField top="Время">            
+                				<Input type='time' placeholder="День"/>
+              				</FormField>
+
+							<Button type="submit" onClick={this.createNew}>Сохранить</Button>
+						</FormLayout>
+					</Group>
 				</Panel>
 			</View>
 		);
 	}
 }
-
-setInterval(App.updateTime, 1000);
 
 export default App;
 
