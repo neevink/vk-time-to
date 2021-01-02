@@ -1,7 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import bridge from '@vkontakte/vk-bridge';
-import View from '@vkontakte/vkui/dist/components/View/View';
-import ScreenSpinner from '@vkontakte/vkui/dist/components/ScreenSpinner/ScreenSpinner';
 import '@vkontakte/vkui/dist/vkui.css';
 
 import Panel from '@vkontakte/vkui/dist/components/Panel/Panel'
@@ -10,7 +7,6 @@ import Button from '@vkontakte/vkui/dist/components/Button/Button'
 import { PanelHeader, Group, Cell, CellButton, FormLayout, Select } from '@vkontakte/vkui';
 import FormField from '@vkontakte/vkui/dist/components/FormField/FormField'
 import Input from '@vkontakte/vkui/dist/components/Input/Input'
-
 
 import PropTypes from 'prop-types';
 import { platform, IOS, ActionSheetItem, ActionSheet } from '@vkontakte/vkui';

@@ -1,15 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Panel from '@vkontakte/vkui/dist/components/Panel/Panel';
-import PanelHeader from '@vkontakte/vkui/dist/components/PanelHeader/PanelHeader';
-import Button from '@vkontakte/vkui/dist/components/Button/Button';
 import Group from '@vkontakte/vkui/dist/components/Group/Group';
 import Cell from '@vkontakte/vkui/dist/components/Cell/Cell';
-import Div from '@vkontakte/vkui/dist/components/Div/Div';
-import Avatar from '@vkontakte/vkui/dist/components/Avatar/Avatar';
-import './Deadline.css';
-
-import DeadlineDetail from './DeadlineDetail'
 
 // Takes props: elements, onSelect (function takes Deadline)
 class ListOfDeadlines extends React.Component{
@@ -18,8 +10,10 @@ class ListOfDeadlines extends React.Component{
 
         this.getLovelyTime = this.getLovelyTime.bind(this);
 
+		let time = new Date();
+
         this.setState({
-            time: new Date(),
+            time: time,
         });
     }
 
@@ -65,7 +59,7 @@ class ListOfDeadlines extends React.Component{
         let array = this.props.elements;
 
         let cells = array.map(e => 
-			<Cell onClick={ () => {this.props.onChoose(e)} }
+			<Cell onClick={ () => { this.props.onChoose(e); } }
 				key={array.indexOf(e)} description={this.getLovelyTime(e.occur)}>
 				{e.name}
 			</Cell>
