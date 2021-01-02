@@ -32,6 +32,7 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline'
 import SelectMimicry from '@vkontakte/vkui/dist/components/SelectMimicry/SelectMimicry'
 
 import EditDeadlinePanel from './panels/EditDeadlinePanel'
+import ListOfDeadlines from './panels/ListOfDeadlines';
 
 //Норм код
 
@@ -54,7 +55,7 @@ class App extends React.Component{
 				occur:new Date('2021-02-02T12:01:00')
 			},
 			{
-				name:"Деделать программку",
+				name:"Доделать программку",
 				occur:new Date('2021-01-01T18:02:00')
 			}]
 		}
@@ -63,6 +64,7 @@ class App extends React.Component{
 		//this.createNew = this.createNew.bind(this);
 		this.delete = this.delete.bind(this);
 		this.createDeadline = this.createDeadline.bind(this);
+		this.selectItem = this.selectItem.bind(this);
 	}
 
 	componentDidMount() {
@@ -109,8 +111,7 @@ class App extends React.Component{
 
 	// deadline has fields: deadlineName, deadlineDate, deadlineTime
 	createDeadline(deadline){
-
-		alert(deadline.deadlineName + ' ' + deadline.deadlineDate + ' '+ deadline.deadlineTime)
+		//alert(deadline.deadlineName + ' ' + deadline.deadlineDate + ' '+ deadline.deadlineTime)
 
 		let name = deadline.deadlineName == '' ? 'Безымянный' : deadline.deadlineName;
 
@@ -129,24 +130,23 @@ class App extends React.Component{
 			time += deadline.deadlineTime + ':00';
 		}
 
-		alert(time);
+		//alert(time);
 		
 		let newDeadline = {
 			name: name,
 			occur:new Date(time)
 		};
 		
-		//this.setState({ activePanel: 'persik' })
-
 		this.setState({ listOfDeadlines: this.state.listOfDeadlines.concat(newDeadline), activePanel: 'home' })
 	}
 
+	// Открыть диалогое окно, которое возволяет выбрать, что сделать с выбранным элементом
 	openDialog () {
 		this.setState({ popout:
 			<ActionSheet 
 				onClose={ () => this.setState({ popout: null }) }
-				iosCloseItem={<ActionSheetItem autoclose mode="cancel">Отменить</ActionSheetItem>}
-			>
+				iosCloseItem={<ActionSheetItem autoclose mode="cancel">Отменить</ActionSheetItem>}>
+
 				<ActionSheetItem autoclose before={<Icon28EditOutline/>} onClick={ () => this.setState({ popout: null, activePanel: 'deadlineDetail'})}>
 					Редактировать
 				</ActionSheetItem>
@@ -157,16 +157,40 @@ class App extends React.Component{
 				  	autoclose
 				  	before={platform === IOS ? <Icon28DeleteOutline/> : <Icon28DeleteOutlineAndroid />}
 					  mode="danger"
-					  onClick={this.delete}
-				>
+					  onClick={this.delete}>
 				  	Удалить дедлайн
 				</ActionSheetItem>
 		  </ActionSheet>
 		});
 	}
 
-	onChangeName(event){
-		this.setState({value: event.target.value});
+	// deadline has fields: name, occur
+	selectItem(deadline){
+		//alert(deadline.name + ' ' + deadline.occur);
+
+		this.setState({ popout:
+			<ActionSheet 
+				onClose={ () => this.setState({ popout: null }) }
+				iosCloseItem={<ActionSheetItem autoclose mode="cancel">Отменить</ActionSheetItem>}>
+
+				<ActionSheetItem autoclose before={<Icon28EditOutline/>}
+					onClick={ () => this.setState({ popout: null, activePanel: 'deadlineDetail'})}>
+					Редактировать
+				</ActionSheetItem>
+
+				<ActionSheetItem autoclose before={<Icon28ShareOutline/>}>
+				  	Поделиться
+				</ActionSheetItem>
+
+				<ActionSheetItem
+				  	autoclose
+				  	before={platform === IOS ? <Icon28DeleteOutline/> : <Icon28DeleteOutlineAndroid />}
+					  mode="danger"
+					  onClick={this.delete}>
+				  	Удалить дедлайн
+				</ActionSheetItem>
+		  	</ActionSheet>
+		});
 	}
 
 	render(){
@@ -182,30 +206,17 @@ class App extends React.Component{
 			<View popout={this.state.popout} activePanel={this.state.activePanel}>
 				<Panel id='home'>
 					<PanelHeader>Дедлайны</PanelHeader>
-
 					<CellButton before={<Icon28AddOutline/>} onClick={ () => this.setState({activePanel:'newDeadline'})}>Создать</CellButton>
 
-					<Group>{listOfItems}</Group>
-
-					<Button onClick={ () => this.setState({activePanel: 'persik'}) }>Клик!</Button>
-
-				</Panel>
-
-				<Persik id='persik'/>
-
-				<Panel id='deadlineDetail'>
-					<PanelHeader
-						left={<PanelHeaderButton onClick={ () => this.setState({activePanel: 'home'})}>
-							{osName === IOS ? <Icon28ChevronBack/> : <Icon24Back/>}
-						</PanelHeaderButton>}
-					>
-						{this.state.selectedDeadline == null ? '' : this.state.selectedDeadline.name}
-					</PanelHeader>
+					<ListOfDeadlines onChoose={this.selectItem} elements={this.state.listOfDeadlines}/>
 				</Panel>
 
 				<EditDeadlinePanel 
-					id='newDeadline' onSend={this.createDeadline} deadlineName='' deadlineDate='' deadlineTime=''/>
+					id='newDeadline' onSend={this.createDeadline} onBack={() => this.setState({activePanel: 'home'})}
+					deadlineName='' deadlineDate='' deadlineTime=''/>
 
+				{/* Персика выпили потом */}
+				<Persik id='persik'/>
 			</View>
 		);
 	}

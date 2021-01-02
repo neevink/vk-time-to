@@ -20,7 +20,7 @@ import Icon24Back from '@vkontakte/icons/dist/24/back';
 
 const osName = platform();
 
-// takes props: id, deadlineName, deadlineDate, dealineTime, onSend - метод, который обрабатывает результаты панели
+// takes props: id, deadlineName, deadlineDate, dealineTime, onSend - метод, который обрабатывает результаты формы
 class EditDeadlinePannel extends React.Component{
 	constructor(props) {
         super(props);
@@ -64,7 +64,7 @@ class EditDeadlinePannel extends React.Component{
         return (
         <Panel id={this.props.id}>
             <PanelHeader 
-                left={<PanelHeaderButton onClick={ () => this.setState({activePanel: 'home'})}> 
+                left={<PanelHeaderButton onClick={ () => this.props.onBack()}> 
                 {osName === IOS ? <Icon28ChevronBack/> : <Icon24Back/>}
             </PanelHeaderButton>}>Новый дедлайн</PanelHeader>
 
@@ -93,7 +93,8 @@ EditDeadlinePannel.propTypes = {
     deadlineDate: PropTypes.string.isRequired,
     deadlineTime: PropTypes.string.isRequired,
      // Function which handle form
-	onSend: PropTypes.func.isRequired,
+    onSend: PropTypes.func.isRequired,
+    onBack: PropTypes.func.isRequired,
 };
 
 export default EditDeadlinePannel
