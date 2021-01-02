@@ -31,6 +31,10 @@ import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline'
 
 import SelectMimicry from '@vkontakte/vkui/dist/components/SelectMimicry/SelectMimicry'
 
+import EditDeadlinePanel from './panels/EditDeadlinePanel'
+
+//Норм код
+
 const osName = platform();
 
 class App extends React.Component{
@@ -42,25 +46,23 @@ class App extends React.Component{
 			selectedDeadline:null,
 			time: Date.now(),
 			listOfDeadlines: [{
-				key:0,
 				name:"Новый год",
 				occur:new Date('2021-01-01T00:00:00')
 			},
 			{
-				key:1,
 				name:"Экзамен по физике",
 				occur:new Date('2021-02-02T12:01:00')
 			},
 			{
-				key:2,
 				name:"Деделать программку",
 				occur:new Date('2021-01-01T18:02:00')
 			}]
 		}
 
 		this.openDialog = this.openDialog.bind(this);
-		this.createNew = this.createNew.bind(this);
+		//this.createNew = this.createNew.bind(this);
 		this.delete = this.delete.bind(this);
+		this.createDeadline = this.createDeadline.bind(this);
 	}
 
 	componentDidMount() {
@@ -105,11 +107,33 @@ class App extends React.Component{
 		this.setState({ listOfDeadlines: arr })
 	}
 
-	createNew(e){
+	// deadline has fields: deadlineName, deadlineDate, deadlineTime
+	createDeadline(deadline){
+
+		alert(deadline.deadlineName + ' ' + deadline.deadlineDate + ' '+ deadline.deadlineTime)
+
+		let name = deadline.deadlineName == '' ? 'Безымянный' : deadline.deadlineName;
+
+		let time;
+		if(deadline.deadlineDate == ''){
+			time = '2021-01-01T';
+		}
+		else{
+			time = deadline.deadlineDate + 'T'
+		}
+
+		if(deadline.deadlineTime == ''){
+			time += '00:00:00';
+		}
+		else{
+			time += deadline.deadlineTime + ':00';
+		}
+
+		alert(time);
+		
 		let newDeadline = {
-			key:19,
-			name:"Новый дедлайн",
-			occur:new Date('2021-01-01T23:57:00')
+			name: name,
+			occur:new Date(time)
 		};
 		
 		//this.setState({ activePanel: 'persik' })
@@ -141,11 +165,15 @@ class App extends React.Component{
 		});
 	}
 
+	onChangeName(event){
+		this.setState({value: event.target.value});
+	}
+
 	render(){
 
         let listOfItems = this.state.listOfDeadlines.map(e => 
 			<Cell onClick={ () => {this.setState({selectedDeadline:e}); this.openDialog()} }
-				key={this.state.listOfDeadlines.indexOf(e)} indicator={this.getLovelyDate(e.occur)}>
+				key={this.state.listOfDeadlines.indexOf(e)} description={this.getLovelyDate(e.occur)}>
 				{e.name}
 			</Cell>
         );
@@ -175,33 +203,9 @@ class App extends React.Component{
 					</PanelHeader>
 				</Panel>
 
-				<Panel id='newDeadline'>
-					<PanelHeader
-						left={<PanelHeaderButton onClick={ () => this.setState({activePanel: 'home'})}>
-							{osName === IOS ? <Icon28ChevronBack/> : <Icon24Back/>}
-						</PanelHeaderButton>}
-					>
-						Новый дедлайн
-					</PanelHeader>
+				<EditDeadlinePanel 
+					id='newDeadline' onSend={this.createDeadline} deadlineName='' deadlineDate='' deadlineTime=''/>
 
-					<Group>
-						<FormLayout >
-							<FormField top="Название">            
-                				<Input placeholder="Название"/>
-              				</FormField>
-
-							<FormField top="День">            
-                				<Input type='date' placeholder="День"/>
-              				</FormField>
-
-							<FormField top="Время">            
-                				<Input type='time' placeholder="День"/>
-              				</FormField>
-
-							<Button type="submit" onClick={this.createNew}>Сохранить</Button>
-						</FormLayout>
-					</Group>
-				</Panel>
 			</View>
 		);
 	}
