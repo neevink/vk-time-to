@@ -38,8 +38,29 @@ class App extends React.Component{
 
 		this.getSaves = this.getSaves.bind(this);
 		this.setSaves = this.setSaves.bind(this);
+		this.shareDeadline = this.shareDeadline.bind(this);
 
 		this.getSaves();
+	}
+
+	shareDeadline(){
+		let deadline = this.state.selectedDeadline;
+
+		let dateOptions = {
+			year: 'numeric',
+			month: 'long',
+			day: 'numeric',
+		}
+
+		let date = deadline.occur.toLocaleDateString('ru', dateOptions);
+		let time = deadline.occur.toTimeString().substr(0, 5);
+
+		let message = `У меня новый дедлайн под названием "${deadline.name}"! Он наступит ${date} в ${time}!\nЗадай и свой дедлайн в приложении Дедлайны ВКонтакте!`;
+		
+		bridge.send('VKWebAppShowWallPostBox', {
+			'message': message,
+			'attachments': 'photo212141958_457245647',
+		});
 	}
 
 	getSaves(){
@@ -165,7 +186,8 @@ class App extends React.Component{
 					Редактировать
 				</ActionSheetItem>
 
-				<ActionSheetItem autoclose before={<Icon28ShareOutline/>}>
+				<ActionSheetItem autoclose before={<Icon28ShareOutline/>}
+					onClick={() => this.shareDeadline()}>
 				  	Поделиться
 				</ActionSheetItem>
 
