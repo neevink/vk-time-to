@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import Group from '@vkontakte/vkui/dist/components/Group/Group';
 import Cell from '@vkontakte/vkui/dist/components/Cell/Cell';
 
+import '../styles/description.css';
+
 // Takes props: elements, onSelect (function takes Deadline)
 class ListOfDeadlines extends React.Component{
     constructor(props){
@@ -14,7 +16,10 @@ class ListOfDeadlines extends React.Component{
 
         this.setState({
             time: time,
-        });
+		});
+		
+		this.selectStyle = this.selectStyle.bind(this);
+		this.selectEmoji = this.selectEmoji.bind(this);
     }
 
     // Установка интервального таймера
@@ -55,13 +60,39 @@ class ListOfDeadlines extends React.Component{
 		return dif + 'д. ' + hours + 'ч. ' + min + 'м. ' + sec + 'с.';
 	}
 
+	selectStyle(deadline){
+		if(deadline.ticked == true){
+			return 'ticked';
+		}
+
+		if(deadline.occur - new Date() < 0){
+			return 'missed'
+		}
+		else{
+			return ''
+		}
+	}
+
+	selectEmoji(deadline){
+		if(deadline.ticked == true){
+			return '✅';
+		}
+
+		if(deadline.occur - new Date() < 0){
+			return '❌'
+		}
+		else{
+			return ''
+		}
+	}
+
     render(){
         let array = this.props.elements;
 
         let cells = array.map(e => 
 			<Cell onClick={ () => { this.props.onChoose(e); } }
 				key={array.indexOf(e)} description={this.getLovelyTime(e.occur)}>
-				{e.name}
+				<div className={this.selectStyle(e)}>{this.selectEmoji(e) + e.name}</div>
 			</Cell>
         );
 

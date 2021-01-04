@@ -46,9 +46,6 @@ class EditDeadlinePannel extends React.Component{
     }
     
     onClickSave(){
-        //alert(this.state.deadlineName + this.state.deadlineDate + this.state.deadlineTime)
-
-
         this.props.onSend( {
             deadlineName: this.state.deadlineName,
             deadlineDate: this.state.deadlineDate,

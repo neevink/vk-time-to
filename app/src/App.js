@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import bridge from '@vkontakte/vk-bridge';
-import View from '@vkontakte/vkui/dist/components/View/View';
-import Panel from '@vkontakte/vkui/dist/components/Panel/Panel'
-import { PanelHeader, CellButton } from '@vkontakte/vkui';
-import { platform, IOS, ActionSheetItem, ActionSheet } from '@vkontakte/vkui';
+import { View, Panel, platform, IOS, ActionSheetItem, ActionSheet, PanelHeader, CellButton } from '@vkontakte/vkui';
+import PropTypes from 'prop-types';
+
 import Icon28DeleteOutline from '@vkontakte/icons/dist/28/delete_outline';
 import Icon28DeleteOutlineAndroid from '@vkontakte/icons/dist/28/delete_outline_android';
 import Icon28ShareOutline from '@vkontakte/icons/dist/28/share_outline'; 
 import Icon28EditOutline from '@vkontakte/icons/dist/28/edit_outline';
-import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline'
+import Icon28AddOutline from '@vkontakte/icons/dist/28/add_outline';
+import Icon28CheckSquareOutline from '@vkontakte/icons/dist/28/check_square_outline';
 
-import EditDeadlinePanel from './panels/EditDeadlinePanel'
+import Icon28CancelOutline from '@vkontakte/icons/dist/28/cancel_outline';
+
+import EditDeadlinePanel from './panels/EditDeadlinePanel';
 import ListOfDeadlines from './panels/ListOfDeadlines';
 
-import PropTypes from 'prop-types';
+import './styles/description.css';
 
 const osName = platform();
 
@@ -39,6 +41,8 @@ class App extends React.Component{
 		this.getSaves = this.getSaves.bind(this);
 		this.setSaves = this.setSaves.bind(this);
 		this.shareDeadline = this.shareDeadline.bind(this);
+		this.tickDeadline = this.tickDeadline.bind(this);
+		this.untickDeadline = this.untickDeadline.bind(this);
 
 		this.getSaves();
 	}
@@ -59,7 +63,7 @@ class App extends React.Component{
 		
 		bridge.send('VKWebAppShowWallPostBox', {
 			'message': message,
-			'attachments': 'photo212141958_457245647',
+			'attachments': 'photo212141958_457245647,https://vk.com/app7714271',
 		});
 	}
 
@@ -71,7 +75,11 @@ class App extends React.Component{
 				let entities = JSON.parse(jsonString);
 
 				let edited = entities.map(e => {
-					return {name: e.name, occur: new Date(e.occur)}
+					return {
+						name: e.name,
+						occur: new Date(e.occur),
+						ticked: e.ticked == undefined ? false : e.ticked,
+					}
 				});
 
   				this.setState( {listOfDeadlines: edited } );
@@ -126,7 +134,8 @@ class App extends React.Component{
 
 		let newDeadline = {
 			name: name,
-			occur:new Date(time)
+			occur:new Date(time),
+			ticked: false,
 		};
 
 		this.state.listOfDeadlines.push(newDeadline);
@@ -157,7 +166,7 @@ class App extends React.Component{
 
 		let editedDeadline = {
 			name: name,
-			occur:new Date(time)
+			occur:new Date(time),
 		};
 
 		let index = this.state.listOfDeadlines.indexOf(this.state.selectedDeadline);
@@ -172,14 +181,45 @@ class App extends React.Component{
 		this.setSaves();
 	}
 
-	// deadline has fields: name, occur
+	tickDeadline(){
+		this.state.selectedDeadline.ticked = true;
+
+		// Хук, чтобы перерисовать список дедлайнов
+		this.setState({listOfDeadlines: this.state.listOfDeadlines});
+	}
+
+	untickDeadline(){
+		this.state.selectedDeadline.ticked = false;
+
+		// Хук, чтобы перерисовать список дедлайнов
+		this.setState({listOfDeadlines: this.state.listOfDeadlines});
+	}
+
+	// deadline has fields: name, occur, ticked
 	selectItem(deadline){
 		this.setState( { selectedDeadline: deadline} );
+
+		let tickItem;
+
+		if(deadline.ticked){
+			tickItem = 	<ActionSheetItem autoclose before={<Icon28CancelOutline/>}
+							onClick={() => this.untickDeadline()}>
+							Отметить как невыполненный
+						</ActionSheetItem>
+		}
+		else{
+			tickItem = 	<ActionSheetItem autoclose before={<Icon28CheckSquareOutline/>}
+							onClick={() => this.tickDeadline()}>
+							Отметить как выполненный
+						</ActionSheetItem>
+		}
 
 		this.setState({ popout:
 			<ActionSheet 
 				onClose={ () => this.setState({ popout: null }) }
 				iosCloseItem={<ActionSheetItem autoclose mode="cancel">Отменить</ActionSheetItem>}>
+
+				{tickItem}
 
 				<ActionSheetItem autoclose before={<Icon28EditOutline/>}
 					onClick={ () => { this.setState({ popout: null, activePanel: 'editDeadline'}); } }>
@@ -222,7 +262,7 @@ class App extends React.Component{
 
 
 			if(month < 10){
-				month = '0' + month; // ОРУ
+				month = '0' + month;
 			}
 			if(day < 10){
 				day = '0' + day;
