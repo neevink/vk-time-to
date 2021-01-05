@@ -186,6 +186,7 @@ class App extends React.Component{
 
 		// Хук, чтобы перерисовать список дедлайнов
 		this.setState({listOfDeadlines: this.state.listOfDeadlines});
+		this.setSaves();
 	}
 
 	untickDeadline(){
@@ -193,6 +194,7 @@ class App extends React.Component{
 
 		// Хук, чтобы перерисовать список дедлайнов
 		this.setState({listOfDeadlines: this.state.listOfDeadlines});
+		this.setSaves();
 	}
 
 	// deadline has fields: name, occur, ticked
