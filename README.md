@@ -1,17 +1,31 @@
-[<img width="134" src="https://vk.com/images/apps/mini_apps/vk_mini_apps_logo.svg">](https://vk.com/services)
+## Overview
+VK Deadlines - an application which helps people to manage their time. Online TODO-list with timer. 
 
-# Дедлайны ВКонтакте - VK Mini App
 
-В разработке применись библиотеки: React JS, VKBridge, VKUI
+- List of timers:
 
-#### Для деплоя приложения на сервера ВКонтакте
+<img src="./docs/main.png">
 
-Перейди в папку с проектом и введи в консоль:
 
-`npm run deploy`
+- Create a new timer:
 
-#### Для локального запуска приложения
+<img src="./docs/editing.png">
 
-Перейди в папку с проектом и введи в консоль:
 
-`npm start` — запустит проект по адресу `localhost:10888`
+- Choosing of element:
+
+<img src="./docs/choosing.png">
+
+
+## Developing
+For developing I used React JS, VKBridge and VKUI
+
+Deploy project:
+```
+npm run deploy
+```
+
+Local run (app will start at `localhost:10888`):
+```
+npm start
+```
